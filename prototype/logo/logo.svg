@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="120" height="120" viewBox="0 0 120 120">
+  <style>
+    /* 为SVG定义变量和样式 */
+    :root {
+      --main-text-color: #008000;
+      --border-color: #e0e0e0;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --main-text-color: #33ff33;
+        --border-color: #33ff33;
+      }
+    }
+    
+    /* 点阵矩阵样式 */
+    .matrix-dot {
+      fill: var(--main-text-color);
+      opacity: 0.3;
+    }
+    
+    /* 闪烁动画 */
+    @keyframes blink-dot {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+    
+    .matrix-dot:nth-child(3n) {
+      animation: blink-dot 2s infinite;
+    }
+    
+    .matrix-dot:nth-child(5n) {
+      animation: blink-dot 3s infinite 0.5s;
+    }
+    
+    .matrix-dot:nth-child(7n) {
+      animation: blink-dot 2.5s infinite 1s;
+    }
+    
+    /* 扫描线动画 */
+    @keyframes scan-line {
+      0% { transform: translateY(-40px); }
+      100% { transform: translateY(40px); }
+    }
+    
+    .scan-line {
+      animation: scan-line 2s linear infinite;
+    }
+    
+    /* 旋转动画 */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .rotating-border {
+      animation: spin 30s linear infinite;
+      transform-origin: center;
+    }
+    
+    /* Logo 主体样式 */
+    .logo-main {
+      transform: rotate(15deg);
+      transform-origin: center;
+    }
+  </style>
+
+  <!-- Logo 主体部分 -->
+  <g class="logo-main">
+    <!-- 背景圆 -->
+    <circle cx="60" cy="60" r="40" fill="rgba(0, 128, 0, 0.1)" stroke="var(--main-text-color)" stroke-width="2" stroke-dasharray="4 2" />
+    
+    <!-- 旋转的虚线边框 -->
+    <circle class="rotating-border" cx="60" cy="60" r="45" fill="none" stroke="var(--main-text-color)" stroke-width="1" stroke-dasharray="2 3" opacity="0.5" />
+    
+    <!-- 点阵矩阵背景 - 8x8网格 -->
+    <g class="matrix-dots">
+      <!-- 生成8x8网格的点 -->
+      <circle class="matrix-dot" cx="30" cy="30" r="2" />
+      <circle class="matrix-dot" cx="40" cy="30" r="2" />
+      <circle class="matrix-dot" cx="50" cy="30" r="2" />
+      <circle class="matrix-dot" cx="60" cy="30" r="2" />
+      <circle class="matrix-dot" cx="70" cy="30" r="2" />
+      <circle class="matrix-dot" cx="80" cy="30" r="2" />
+      <circle class="matrix-dot" cx="90" cy="30" r="2" />
+      
+      <circle class="matrix-dot" cx="30" cy="40" r="2" />
+      <circle class="matrix-dot" cx="40" cy="40" r="2" />
+      <circle class="matrix-dot" cx="50" cy="40" r="2" />
+      <circle class="matrix-dot" cx="60" cy="40" r="2" />
+      <circle class="matrix-dot" cx="70" cy="40" r="2" />
+      <circle class="matrix-dot" cx="80" cy="40" r="2" />
+      <circle class="matrix-dot" cx="90" cy="40" r="2" />
+      
+      <circle class="matrix-dot" cx="30" cy="50" r="2" />
+      <circle class="matrix-dot" cx="40" cy="50" r="2" />
+      <circle class="matrix-dot" cx="50" cy="50" r="2" />
+      <circle class="matrix-dot" cx="60" cy="50" r="2" />
+      <circle class="matrix-dot" cx="70" cy="50" r="2" />
+      <circle class="matrix-dot" cx="80" cy="50" r="2" />
+      <circle class="matrix-dot" cx="90" cy="50" r="2" />
+      
+      <circle class="matrix-dot" cx="30" cy="60" r="2" />
+      <circle class="matrix-dot" cx="40" cy="60" r="2" />
+      <circle class="matrix-dot" cx="50" cy="60" r="2" />
+      <circle class="matrix-dot" cx="60" cy="60" r="2" />
+      <circle class="matrix-dot" cx="70" cy="60" r="2" />
+      <circle class="matrix-dot" cx="80" cy="60" r="2" />
+      <circle class="matrix-dot" cx="90" cy="60" r="2" />
+      
+      <circle class="matrix-dot" cx="30" cy="70" r="2" />
+      <circle class="matrix-dot" cx="40" cy="70" r="2" />
+      <circle class="matrix-dot" cx="50" cy="70" r="2" />
+      <circle class="matrix-dot" cx="60" cy="70" r="2" />
+      <circle class="matrix-dot" cx="70" cy="70" r="2" />
+      <circle class="matrix-dot" cx="80" cy="70" r="2" />
+      <circle class="matrix-dot" cx="90" cy="70" r="2" />
+      
+      <circle class="matrix-dot" cx="30" cy="80" r="2" />
+      <circle class="matrix-dot" cx="40" cy="80" r="2" />
+      <circle class="matrix-dot" cx="50" cy="80" r="2" />
+      <circle class="matrix-dot" cx="60" cy="80" r="2" />
+      <circle class="matrix-dot" cx="70" cy="80" r="2" />
+      <circle class="matrix-dot" cx="80" cy="80" r="2" />
+      <circle class="matrix-dot" cx="90" cy="80" r="2" />
+      
+      <circle class="matrix-dot" cx="30" cy="90" r="2" />
+      <circle class="matrix-dot" cx="40" cy="90" r="2" />
+      <circle class="matrix-dot" cx="50" cy="90" r="2" />
+      <circle class="matrix-dot" cx="60" cy="90" r="2" />
+      <circle class="matrix-dot" cx="70" cy="90" r="2" />
+      <circle class="matrix-dot" cx="80" cy="90" r="2" />
+      <circle class="matrix-dot" cx="90" cy="90" r="2" />
+    </g>
+    
+    <!-- 扫描线 -->
+    <line class="scan-line" x1="20" y1="60" x2="100" y2="60" stroke="var(--main-text-color)" stroke-width="2" opacity="0.5" />
+    
+    <!-- 终端图标 - 使用路径代替Font Awesome图标 -->
+    <g transform="translate(40, 40) scale(0.04, 0.04)">
+      <path d="M257.981 272.971L63.638 467.314c-9.373 9.373-24.569 9.373-33.941 0L7.029 444.647c-9.357-9.357-9.375-24.522-.04-33.901L161.011 256 6.99 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L257.981 239.03c9.373 9.372 9.373 24.568 0 33.941zM640 456v-32c0-13.255-10.745-24-24-24H312c-13.255 0-24 10.745-24 24v32c0 13.255 10.745 24 24 24h304c13.255 0 24-10.745 24-24z" 
+            fill="var(--main-text-color)" 
+            filter="drop-shadow(0 0 3px var(--main-text-color))"/>
+    </g>
+  </g>
+  
+  <!-- 使用SVG filter实现发光效果 -->
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="5" result="blur"/>
+    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+  </filter>
+</svg> 

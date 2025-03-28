@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotMatrix.io - 编辑用户</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: var(--terminal-font);
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .user-edit-container {
+            padding: 1rem;
+        }
+        
+        .user-edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .user-edit-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--heading-font);
+        }
+        
+        .form-container {
+            background-color: var(--panel-bg-color);
+            border: 1px dotted var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 1.25rem;
+        }
+        
+        .form-group:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--main-text-color);
+            font-family: var(--terminal-font);
+        }
+        
+        .form-note {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            opacity: 0.8;
+        }
+        
+        /* 左侧导航栏品牌部分样式 */
+        .nav-brand {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 1rem 0.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        .nav-brand-logo {
+            width: 45px;
+            height: 45px;
+            margin-right: 0.7rem;
+            filter: drop-shadow(0 0 3px var(--main-text-color));
+        }
+        
+        .nav-brand-title {
+            font-family: var(--terminal-font);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--main-text-color);
+            text-shadow: 1px 1px 0 rgba(0, 50, 0, 0.5), 
+                        -1px -1px 0 rgba(0, 255, 0, 0.2);
+            font-weight: bold;
+            padding: 2px 0;
+            background: linear-gradient(to bottom, 
+                        rgba(0, 255, 0, 0.05) 0%, 
+                        rgba(0, 255, 0, 0.1) 50%, 
+                        rgba(0, 255, 0, 0.05) 100%);
+            position: relative;
+            max-width: 130px; /* 确保不超过侧边栏宽度 */
+        }
+        
+        .nav-brand-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="nav-brand">
+                <img src="logo/logo.svg" width="45" height="45" alt="DotMatrix.io Logo" class="nav-brand-logo" style="transform: rotate(-15deg) !important;">
+                <div class="nav-brand-title" style="font-size: 1.8rem; max-width: 170px;">DotMatrix.io</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <i class="fas fa-chart-line"></i> 仪表盘
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-search"></i> 域名查询
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-tags"></i> 域名管理
+                </li>
+                <li class="nav-item active">
+                    <i class="fas fa-users"></i> 用户管理
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-cog"></i> 系统设置
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-terminal"></i> 命令行
+                </li>
+            </ul>
+            
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 顶部导航栏 -->
+            <div class="header">
+                <div>
+                    <h1>编辑用户</h1>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="user-info mr-4">
+                        <span>用户: ADMIN</span> | 
+                        <span class="time-display" id="timeDisplay">00:00:00</span>
+                    </div>
+                    
+                    <div class="theme-switch-wrapper mr-4">
+                        <label class="theme-switch">
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <a href="login.html" class="text-warning">
+                        <i class="fas fa-power-off"></i> 退出
+                    </a>
+                </div>
+            </div>
+            
+            <div class="dashboard-container">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>用户信息</h3>
+                        <div class="text-sm">用户ID: 001 | 上次修改: 1986-03-12</div>
+                    </div>
+                    
+                    <div class="form-container">
+                        <form>
+                            <div class="form-group">
+                                <label for="username">用户名:</label>
+                                <input type="text" id="username" class="search-input w-full" value="ADMIN" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">电子邮箱:</label>
+                                <input type="email" id="email" class="search-input w-full" value="ADMIN@SYSTEM.COM" required>
+                            </div>
+                            
+                            <div class="form-group grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="role">角色:</label>
+                                    <select id="role" class="search-input w-full">
+                                        <option value="admin" selected>系统管理员</option>
+                                        <option value="user">普通用户</option>
+                                        <option value="guest">访客</option>
+                                        <option value="operator">操作员</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="status">状态:</label>
+                                    <select id="status" class="search-input w-full">
+                                        <option value="active" selected>活跃</option>
+                                        <option value="inactive">禁用</option>
+                                        <option value="pending">待审核</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="password">密码:</label>
+                                    <input type="password" id="password" class="search-input w-full" placeholder="********">
+                                    <div class="form-note">留空表示不修改</div>
+                                </div>
+                                <div>
+                                    <label for="confirm_password">确认密码:</label>
+                                    <input type="password" id="confirm_password" class="search-input w-full" placeholder="********">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="remarks">备注信息:</label>
+                                <textarea id="remarks" class="search-input w-full" rows="3">系统主管理员账户，拥有全部权限。创建于1986年。</textarea>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <button type="button" class="btn btn-danger" onclick="history.back()">
+                                    <i class="fas fa-times"></i> 取消
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> 保存更改
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="ascii-box mt-3 mb-3">
+                    提示: 用户名和邮箱不能为空，且不能与现有用户重复
+                </div>
+                
+                <div class="classic-divider">
+                    <span>READY.</span>
+                    <span class="blink-cursor"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示当前时间
+            function updateTime() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString();
+                document.getElementById('timeDisplay').textContent = timeStr;
+            }
+            
+            setInterval(updateTime, 1000);
+            updateTime();
+            
+            // 导航栏点击效果
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 主题切换
+            const themeSwitch = document.getElementById('themeSwitch');
+            
+            // 检查本地存储中的主题设置
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeSwitch.checked = true;
+            }
+            
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+            
+            // 显示帮助信息
+            function showHelp() {
+                alert(
+                    '快捷键列表:\n' +
+                    'F1 - 显示帮助\n' +
+                    'F2 - 重置表单\n' +
+                    'F3 - 聚焦用户名\n' +
+                    'Ctrl+S - 保存更改\n' +
+                    'ESC - 返回上一页'
+                );
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotMatrix.io - 用户管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: var(--terminal-font);
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .user-container {
+            padding: 1rem;
+        }
+        
+        .user-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--heading-font);
+        }
+        
+        .user-table {
+            width: 100%;
+            margin-bottom: 1.5rem;
+            border: 1px dotted var(--border-color);
+        }
+        
+        .user-table th {
+            background-color: var(--header-bg-color);
+            color: var(--main-text-color);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 1px dotted var(--border-color);
+        }
+        
+        .user-table td {
+            padding: 0.75rem;
+            border-bottom: 1px dotted var(--border-color);
+        }
+        
+        .user-table tr:hover {
+            background-color: rgba(0, 128, 0, 0.1);
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px dotted var(--border-color);
+            background-color: #ffffff;
+            color: var(--main-text-color);
+            font-family: var(--terminal-font);
+        }
+        
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.25rem;
+            cursor: pointer;
+            font-family: var(--terminal-font);
+            border: none;
+            color: #ffffff;
+        }
+        
+        .edit-btn {
+            background-color: var(--secondary-color);
+        }
+        
+        .delete-btn {
+            background-color: var(--error-color);
+        }
+        
+        /* 左侧导航栏品牌部分样式 */
+        .nav-brand {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 1rem 0.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        .nav-brand-logo {
+            width: 45px;
+            height: 45px;
+            margin-right: 0.7rem;
+            filter: drop-shadow(0 0 3px var(--main-text-color));
+        }
+        
+        .nav-brand-title {
+            font-family: var(--terminal-font);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--main-text-color);
+            text-shadow: 1px 1px 0 rgba(0, 50, 0, 0.5), 
+                        -1px -1px 0 rgba(0, 255, 0, 0.2);
+            font-weight: bold;
+            padding: 2px 0;
+            background: linear-gradient(to bottom, 
+                        rgba(0, 255, 0, 0.05) 0%, 
+                        rgba(0, 255, 0, 0.1) 50%, 
+                        rgba(0, 255, 0, 0.05) 100%);
+            position: relative;
+            max-width: 130px; /* 确保不超过侧边栏宽度 */
+        }
+        
+        .nav-brand-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="nav-brand">
+                <img src="logo/logo.svg" width="45" height="45" alt="DotMatrix.io Logo" class="nav-brand-logo" style="transform: rotate(-15deg) !important;">
+                <div class="nav-brand-title" style="font-size: 1.8rem; max-width: 170px;">DotMatrix.io</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <i class="fas fa-chart-line"></i> 仪表盘
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-search"></i> 域名查询
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-tags"></i> 域名管理
+                </li>
+                <li class="nav-item active">
+                    <i class="fas fa-users"></i> 用户管理
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-cog"></i> 系统设置
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-terminal"></i> 命令行
+                </li>
+            </ul>
+            
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 顶部导航栏 -->
+            <div class="header">
+                <div>
+                    <h1>用户管理</h1>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="user-info mr-4">
+                        <span>用户: ADMIN</span> | 
+                        <span class="time-display" id="timeDisplay">00:00:00</span>
+                    </div>
+                    
+                    <div class="theme-switch-wrapper mr-4">
+                        <label class="theme-switch">
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <a href="login.html" class="text-warning">
+                        <i class="fas fa-power-off"></i> 退出
+                    </a>
+                </div>
+            </div>
+                
+            <div class="dashboard-container">
+                <div class="panel">
+                    <div class="search-bar mt-2">
+                        <input type="text" class="search-input" placeholder="搜索用户名、邮箱或角色...">
+                        <button class="btn">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-plus"></i> 添加用户
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="ascii-box mt-3 mb-3">
+                    系统当前有 4 个用户账户，其中 3 个处于活跃状态
+                </div>
+                
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>邮箱</th>
+                            <th>角色</th>
+                            <th>状态</th>
+                            <th>注册时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>001</td>
+                            <td>ADMIN</td>
+                            <td>ADMIN@SYSTEM.COM</td>
+                            <td>系统管理员</td>
+                            <td><span class="status-badge status-available">活跃</span></td>
+                            <td>1986-03-12</td>
+                            <td>
+                                <button class="action-btn edit-btn">编辑</button>
+                                <button class="action-btn delete-btn">删除</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>002</td>
+                            <td>USER1</td>
+                            <td>USER1@DOMAIN.COM</td>
+                            <td>普通用户</td>
+                            <td><span class="status-badge status-available">活跃</span></td>
+                            <td>1987-05-22</td>
+                            <td>
+                                <button class="action-btn edit-btn">编辑</button>
+                                <button class="action-btn delete-btn">删除</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>003</td>
+                            <td>GUEST</td>
+                            <td>GUEST@TEMP.COM</td>
+                            <td>访客</td>
+                            <td><span class="status-badge status-taken">禁用</span></td>
+                            <td>1988-11-05</td>
+                            <td>
+                                <button class="action-btn edit-btn">编辑</button>
+                                <button class="action-btn delete-btn">删除</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>004</td>
+                            <td>OPERATOR</td>
+                            <td>OPS@SYSTEM.COM</td>
+                            <td>操作员</td>
+                            <td><span class="status-badge status-available">活跃</span></td>
+                            <td>1986-09-30</td>
+                            <td>
+                                <button class="action-btn edit-btn">编辑</button>
+                                <button class="action-btn delete-btn">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination flex items-center justify-between">
+                    <div>
+                        <span>共 4 条记录，每页显示</span>
+                        <select class="ml-2 mr-2">
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select>
+                        <span>条</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm" disabled>&lt;&lt;</button>
+                        <button class="btn btn-sm active">1</button>
+                        <button class="btn btn-sm">&gt;&gt;</button>
+                    </div>
+                </div>
+                
+                <div class="classic-divider">
+                    <span>READY.</span>
+                    <span class="blink-cursor"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示当前时间
+            function updateTime() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString();
+                document.getElementById('timeDisplay').textContent = timeStr;
+            }
+            
+            setInterval(updateTime, 1000);
+            updateTime();
+            
+            // 导航栏点击效果
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 主题切换
+            const themeSwitch = document.getElementById('themeSwitch');
+            
+            // 检查本地存储中的主题设置
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeSwitch.checked = true;
+            }
+            
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+            
+            // 显示帮助信息
+            function showHelp() {
+                alert(
+                    '快捷键列表:\n' +
+                    'F1 - 显示帮助\n' +
+                    'F2 - 添加新用户\n' +
+                    'F3 - 搜索用户\n' +
+                    'F4 - 刷新列表\n' +
+                    'F5 - 切换主题\n' +
+                    'ESC - 返回上一页'
+                );
+            }
+        });
+    </script>
+</body>
+</html>

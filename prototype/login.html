@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotMatrix.io - 登录</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: var(--terminal-font);
+            background-color: #f0f0f0; /* 特定的灰色背景，仅用于登录页面 */
+            color: var(--main-text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* 终端风格的网格背景 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 128, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 128, 0, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* 深色模式下的背景 */
+        [data-theme="dark"] body {
+            background-color: #000000 !important; /* 强制使用黑色背景 */
+        }
+        
+        [data-theme="dark"] body::before {
+            opacity: 0; /* 在深色模式下隐藏网格背景 */
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-top: 20px;
+        }
+        
+        .login-logo {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) rotate(-15deg);
+            z-index: 2;
+            opacity: 0.85;
+            filter: drop-shadow(0 0 5px var(--main-text-color));
+        }
+        
+        .login-title {
+            font-family: var(--heading-font);
+            margin-bottom: 0.5rem;
+            margin-top: 40px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 3px var(--main-bg-color);
+        }
+        
+        .login-subtitle {
+            opacity: 0.7;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 3px var(--main-bg-color);
+        }
+        
+        .login-form {
+            background-color: var(--panel-bg-color);
+            border: 1px dotted var(--border-color);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #ffffff;
+            border: 1px dotted var(--border-color);
+            color: var(--main-text-color);
+            font-family: var(--terminal-font);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--main-text-color);
+            color: #ffffff;
+            font-family: var(--heading-font);
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0, 50, 0, 0.8);
+            border: 2px solid;
+            border-color: #00a000 #005000 #005000 #00a000;
+            box-shadow: 2px 2px 0 #003000, inset 1px 1px 0 rgba(255, 255, 255, 0.5);
+            position: relative;
+            transition: all 0.2s;
+            outline: 1px dotted #00ff00;
+            outline-offset: -4px;
+        }
+        
+        .login-button:hover {
+            background-color: #00a000;
+            box-shadow: 3px 3px 0 #003000, inset 1px 1px 0 rgba(255, 255, 255, 0.7);
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        
+        .login-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0 0 0 #003000, inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+            border-color: #005000 #00a000 #00a000 #005000;
+        }
+        
+        .login-footer {
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .text-gray-500 {
+            color: var(--main-text-color);
+            opacity: 0.7;
+            font-family: var(--terminal-font);
+        }
+        
+        /* 80年代风格的输入框焦点效果 */
+        .form-control:focus {
+            outline: none;
+            border: 2px solid var(--main-text-color);
+            box-shadow: 0 0 8px var(--main-text-color), inset 0 0 4px var(--main-text-color);
+            animation: input-pulse 1.5s infinite;
+        }
+        
+        @keyframes input-pulse {
+            0% { border-color: var(--main-text-color); }
+            50% { border-color: #006700; }
+            100% { border-color: var(--main-text-color); }
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: 1px dotted var(--border-color);
+            color: var(--main-text-color);
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--main-text-color);
+            box-shadow: 0 0 5px var(--main-text-color);
+        }
+        
+        /* 深色模式下的主题切换按钮 */
+        [data-theme="dark"] .theme-toggle {
+            background-color: #1a1a1a;
+            border: 1px dotted #00a000;
+        }
+        
+        [data-theme="dark"] .theme-toggle i {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00a000;
+        }
+        
+        /* 确保深色模式生效的最高优先级样式 */
+        html[data-theme="dark"] body,
+        body[data-theme="dark"],
+        [data-theme="dark"] {
+            background-color: #000000 !important;
+        }
+        
+        html[data-theme="dark"] *::before,
+        body[data-theme="dark"] *::before,
+        [data-theme="dark"] *::before {
+            opacity: 0 !important;
+        }
+        
+        /* 主题切换开关样式 */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: transparent;
+            transition: .4s;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #008000;
+        }
+        
+        .slider:before {
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            content: "\f185"; /* 太阳图标 */
+            font-size: 24px;
+            transition: all 0.4s;
+        }
+        
+        input:checked + .slider {
+            background-color: transparent;
+            color: #33ff33; /* 深色主题下的图标颜色 */
+        }
+        
+        input:checked + .slider:before {
+            transform: rotate(360deg);
+            content: "\f186"; /* 月亮图标 */
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-switch-wrapper" style="position: absolute; top: 1rem; right: 1rem; z-index: 10;">
+        <label class="theme-switch">
+            <input type="checkbox" id="themeSwitch">
+            <span class="slider"></span>
+        </label>
+    </div>
+    
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <img src="logo/logo.svg" width="120" height="120" alt="DotMatrix.io Logo">
+            </div>
+            <h1 class="login-title text-2xl">DotMatrix.io</h1>
+            <p class="login-subtitle">The Terminal-Era Domain Manager</p>
+        </div>
+        
+        <div class="login-form">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" class="form-control" placeholder="输入您的用户名">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" class="form-control" placeholder="输入您的密码">
+            </div>
+            
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <input type="checkbox" id="remember" class="mr-2">
+                    <label for="remember">记住我</label>
+                </div>
+                <a href="#" class="text-gray-500">忘记密码？</a>
+            </div>
+            
+            <button onclick="location.href='dashboard.html'" class="login-button">
+                登录系统
+            </button>
+        </div>
+        
+        <div class="login-footer">
+            <p>域名管理系统 v0.8.6 Beta | 2025-2026</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 自动聚焦用户名输入框
+            document.getElementById('username').focus();
+            
+            // 按下回车键时提交表单
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+            
+            // 主题切换功能
+            const themeSwitch = document.getElementById('themeSwitch');
+            
+            // 检查本地存储中的主题设置
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeSwitch.checked = true;
+            }
+            
+            // 切换主题
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

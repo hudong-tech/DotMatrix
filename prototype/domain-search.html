@@ -1,0 +1,708 @@
+<!-- 
+域名查询系统需求分析:
+
+1. 查询流程设计:
+   - 采用流式展示：查询一条立即显示一条，新查询结果以轻微高亮效果显示，渐变消失
+   - 分批次进行查询：每批20条，避免过多请求导致API限流或服务器负载过重
+   - 在批次之间有短暂停顿(1-2秒)，避免请求过于密集
+
+2. 进度显示:
+   - 显示详细批次进度：如"第2批/共5批(27%)"
+   - 提供查询状态指示：包含加载动画、百分比和批次信息
+   - 查询完成后显示完成标识
+
+3. 用户控制功能:
+   - 停止查询功能：用户可随时停止查询，但会完成当前批次后停止
+   - 筛选功能："仅显示可注册"选项，便于快速查看可用域名
+   - 一键保存功能：将所有可注册域名保存到数据库
+
+4. 性能考量:
+   - 批次查询避免同时发送过多请求，降低被API封禁风险
+   - 即时显示结果，提高用户体验，不必等待全部查询完成
+   - 渐进式加载减轻浏览器渲染负担
+
+5. 用户体验优化:
+   - 新结果高亮便于识别最新查询结果
+   - 表格行悬停效果增强交互体验
+   - 响应式设计适应不同屏幕尺寸
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotMatrix.io - 域名查询</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: var(--terminal-font);
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .search-container {
+            padding: 1rem;
+        }
+        
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-form {
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.5rem;
+            font-family: var(--terminal-font);
+        }
+        
+        .search-results {
+            border: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+            font-family: var(--terminal-font);
+        }
+        
+        .result-header {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            font-family: var(--heading-font);
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .result-table {
+            width: 100%;
+            font-family: var(--terminal-font);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-family: var(--terminal-font);
+        }
+        
+        .status-available {
+            background-color: rgba(0, 128, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .status-taken {
+            background-color: rgba(128, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+        
+        .status-pending {
+            background-color: rgba(128, 128, 0, 0.2);
+            border: 1px solid #ffff00;
+            color: #ffff00;
+        }
+        
+        .filter-group {
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-family: var(--terminal-font);
+        }
+        
+        .filter-title {
+            margin-bottom: 0.5rem;
+            font-family: var(--heading-font);
+            font-size: 0.9rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-family: var(--terminal-font);
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-right: 1rem;
+            font-family: var(--terminal-font);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            border: 1px solid var(--border-color);
+            font-family: var(--terminal-font);
+        }
+        
+        /* 深色模式下的搜索输入框 */
+        [data-theme="dark"] .search-input {
+            background-color: #0a0a0a;
+        }
+        
+        .range-slider {
+            width: 100%;
+            margin: 1rem 0;
+            font-family: var(--terminal-font);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .search-button {
+            background-color: var(--main-text-color);
+            color: #000;
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            font-family: var(--heading-font);
+            font-size: 0.9rem;
+            border: none;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-button:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 10px var(--main-text-color);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(51, 255, 51, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--main-text-color);
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        .pagination {
+            font-family: var(--terminal-font);
+        }
+        
+        label {
+            font-family: var(--terminal-font);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 左侧导航栏品牌部分样式 */
+        .nav-brand {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 1rem 0.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        .nav-brand-logo {
+            width: 45px;
+            height: 45px;
+            margin-right: 0.7rem;
+            filter: drop-shadow(0 0 3px var(--main-text-color));
+        }
+        
+        .nav-brand-title {
+            font-family: var(--terminal-font);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--main-text-color);
+            text-shadow: 1px 1px 0 rgba(0, 50, 0, 0.5), 
+                        -1px -1px 0 rgba(0, 255, 0, 0.2);
+            font-weight: bold;
+            padding: 2px 0;
+            background: linear-gradient(to bottom, 
+                        rgba(0, 255, 0, 0.05) 0%, 
+                        rgba(0, 255, 0, 0.1) 50%, 
+                        rgba(0, 255, 0, 0.05) 100%);
+            position: relative;
+            max-width: 130px; /* 确保不超过侧边栏宽度 */
+        }
+        
+        .nav-brand-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="nav-brand">
+                <img src="logo/logo.svg" width="45" height="45" alt="DotMatrix.io Logo" class="nav-brand-logo" style="transform: rotate(-15deg) !important;">
+                <div class="nav-brand-title" style="font-size: 1.8rem; max-width: 170px;">DotMatrix.io</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <i class="fas fa-chart-line"></i> 仪表盘
+                </li>
+                <li class="nav-item active">
+                    <i class="fas fa-search"></i> 域名查询
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-tags"></i> 域名管理
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-users"></i> 用户管理
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-cog"></i> 系统设置
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-terminal"></i> 命令行
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 顶部导航栏 -->
+            <div class="header">
+                <div>
+                    <h1>域名查询</h1>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="user-info mr-4">
+                        <span>用户: ADMIN</span> | 
+                        <span class="time-display" id="timeDisplay">00:00:00</span>
+                    </div>
+                    
+                    <div class="theme-switch-wrapper mr-4">
+                        <label class="theme-switch">
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <a href="login.html" class="text-warning">
+                        <i class="fas fa-power-off"></i> 退出
+                    </a>
+                </div>
+            </div>
+            
+            <div class="dashboard-container">
+                <div class="panel">
+                    <div class="flex justify-between items-center mt-1">
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <div class="filter-title mb-0 whitespace-nowrap">长度：</div>
+                                <select id="domain-length" class="search-input mb-0 w-20">
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5" selected>5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <div class="filter-title mb-0 whitespace-nowrap">后缀：</div>
+                                <select id="domain-extension" class="search-input mb-0 w-24">
+                                    <option value="com" selected>.com</option>
+                                    <option value="net">.net</option>
+                                    <option value="ai">.ai</option>
+                                    <option value="io">.io</option>
+                                    <option value="app">.app</option>
+                                    <option value="tech">.tech</option>
+                                    <option value="cc">.cc</option>
+                                    <option value="xyz">.xyz</option>
+                                    <option value="top">.top</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="whitespace-nowrap">
+                            <button class="btn">
+                                <i class="fas fa-search mr-2"></i> 开始查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel mt-4">
+                    <div class="panel-header">
+                        <div>
+                            查询结果: <span id="result-count">42</span> 个域名
+                        </div>
+                        <div class="flex items-center">
+                            <div class="query-status">
+                                <span class="spinner mr-2"></span> 
+                                <span>查询中... 第<span id="current-batch">2</span>批/共<span id="total-batches">5</span>批 (<span id="progress-percentage">27</span>%)</span>
+                            </div>
+                            <button class="btn btn-danger ml-3">
+                                <i class="fas fa-stop mr-1"></i> 停止查询
+                            </button>
+                            <button class="btn btn-success ml-2">
+                                <i class="fas fa-save mr-1"></i> 一键保存
+                            </button>
+                            <div class="filter-quick ml-3">
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" class="mr-1" id="showAvailableOnly">
+                                    <span>仅显示可注册</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-auto">
+                        <table class="result-table">
+                            <thead>
+                                <tr>
+                                    <th width="5%">ID</th>
+                                    <th width="40%">域名</th>
+                                    <th width="15%">长度</th>
+                                    <th width="15%">状态</th>
+                                    <th width="25%">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>abcde.com</td>
+                                    <td>5</td>
+                                    <td><span class="status-badge status-taken">已注册</span></td>
+                                    <td>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-star"></i></button>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-info-circle"></i></button>
+                                        <button class="btn btn-sm"><i class="fas fa-tag"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="new-result">
+                                    <td>2</td>
+                                    <td>abcdf.com</td>
+                                    <td>5</td>
+                                    <td><span class="status-badge status-available">可注册</span></td>
+                                    <td>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-star"></i></button>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-info-circle"></i></button>
+                                        <button class="btn btn-sm"><i class="fas fa-tag"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>abcdg.com</td>
+                                    <td>5</td>
+                                    <td><span class="status-badge status-pending">查询中</span></td>
+                                    <td>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-star"></i></button>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-info-circle"></i></button>
+                                        <button class="btn btn-sm"><i class="fas fa-tag"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="new-result">
+                                    <td>4</td>
+                                    <td>abcdh.com</td>
+                                    <td>5</td>
+                                    <td><span class="status-badge status-available">可注册</span></td>
+                                    <td>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-star"></i></button>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-info-circle"></i></button>
+                                        <button class="btn btn-sm"><i class="fas fa-tag"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>abcdi.com</td>
+                                    <td>5</td>
+                                    <td><span class="status-badge status-taken">已注册</span></td>
+                                    <td>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-star"></i></button>
+                                        <button class="btn btn-sm mr-1"><i class="fas fa-info-circle"></i></button>
+                                        <button class="btn btn-sm"><i class="fas fa-tag"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination p-3 flex items-center justify-between">
+                        <div>
+                            <span>显示 1-5 / 42 结果</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="whitespace-nowrap">每页：</span>
+                                <select class="search-input mb-0 w-16 text-center">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-sm mr-1">上一页</button>
+                            <button class="btn btn-sm">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示当前时间
+            function updateTime() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString();
+                document.getElementById('timeDisplay').textContent = timeStr;
+            }
+            
+            setInterval(updateTime, 1000);
+            updateTime();
+            
+            // 导航栏点击效果
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 主题切换
+            const themeSwitch = document.getElementById('themeSwitch');
+            
+            // 检查本地存储中的主题设置
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeSwitch.checked = true;
+            }
+            
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+            
+            // 域名查询相关功能
+            const startQueryBtn = document.querySelector('.btn:not(.btn-danger):not(.btn-success)');
+            const stopQueryBtn = document.querySelector('.btn-danger');
+            const saveResultsBtn = document.querySelector('.btn-success');
+            const showAvailableOnlyCheckbox = document.getElementById('showAvailableOnly');
+            
+            let isQuerying = false;
+            let shouldStopQuery = false;
+            const BATCH_SIZE = 20; // 每批次查询20条数据
+            
+            // 模拟查询过程
+            startQueryBtn.addEventListener('click', function() {
+                if (isQuerying) return;
+                
+                const domainLength = document.getElementById('domain-length').value;
+                const domainExtension = document.getElementById('domain-extension').value;
+                
+                // 模拟启动查询
+                startQuery(domainLength, domainExtension);
+            });
+            
+            // 停止查询
+            stopQueryBtn.addEventListener('click', function() {
+                shouldStopQuery = true;
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> 停止中...';
+                console.log('查询将在完成当前批次后停止');
+            });
+            
+            // 一键保存功能
+            saveResultsBtn.addEventListener('click', function() {
+                saveAvailableDomains();
+            });
+            
+            // 仅显示可注册域名筛选
+            showAvailableOnlyCheckbox.addEventListener('change', function() {
+                filterAvailableDomains(this.checked);
+            });
+            
+            // 模拟开始查询流程
+            function startQuery(length, extension) {
+                isQuerying = true;
+                shouldStopQuery = false;
+                
+                // 重置UI状态
+                document.getElementById('result-count').textContent = '0';
+                document.querySelector('tbody').innerHTML = '';
+                stopQueryBtn.disabled = false;
+                stopQueryBtn.innerHTML = '<i class="fas fa-stop mr-1"></i> 停止查询';
+                
+                // 假设我们要查询100个域名，分5批
+                const totalDomains = 100;
+                const totalBatches = Math.ceil(totalDomains / BATCH_SIZE);
+                
+                document.getElementById('total-batches').textContent = totalBatches;
+                document.getElementById('current-batch').textContent = '1';
+                document.getElementById('progress-percentage').textContent = '0';
+                
+                // 模拟批次查询过程
+                processQueryBatch(1, totalBatches, length, extension);
+            }
+            
+            // 模拟处理查询批次
+            function processQueryBatch(currentBatch, totalBatches, length, extension) {
+                if (shouldStopQuery || currentBatch > totalBatches) {
+                    finishQuery();
+                    return;
+                }
+                
+                // 更新进度信息
+                document.getElementById('current-batch').textContent = currentBatch;
+                const progressPercentage = Math.floor((currentBatch - 1) / totalBatches * 100);
+                document.getElementById('progress-percentage').textContent = progressPercentage;
+                
+                // 模拟批次查询延迟
+                setTimeout(function() {
+                    // 模拟添加查询结果
+                    addBatchResults(currentBatch, length, extension);
+                    
+                    // 处理下一批
+                    processQueryBatch(currentBatch + 1, totalBatches, length, extension);
+                }, 1500); // 每批次间隔1.5秒
+            }
+            
+            // 模拟添加批次结果
+            function addBatchResults(batchNumber, length, extension) {
+                const tbody = document.querySelector('tbody');
+                const currentCount = parseInt(document.getElementById('result-count').textContent) || 0;
+                
+                // 每批次添加随机数量的结果(10-20条)
+                const batchResultCount = Math.floor(Math.random() * 10) + 10;
+                
+                for (let i = 0; i < batchResultCount; i++) {
+                    const resultId = currentCount + i + 1;
+                    const domainName = generateRandomDomain(length, extension);
+                    const isAvailable = Math.random() > 0.6; // 随机可用性(40%可注册)
+                    
+                    const newRow = document.createElement('tr');
+                    newRow.className = 'new-result';
+                    newRow.innerHTML = `
+                        <td>${resultId}</td>
+                        <td>${domainName}</td>
+                        <td>${length}</td>
+                        <td><span class="status-badge status-${isAvailable ? 'available' : 'taken'}">${isAvailable ? '可注册' : '已注册'}</span></td>
+                        <td>
+                            <button class="btn btn-sm mr-1"><i class="fas fa-star"></i></button>
+                            <button class="btn btn-sm mr-1"><i class="fas fa-info-circle"></i></button>
+                            <button class="btn btn-sm"><i class="fas fa-tag"></i></button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(newRow);
+                    
+                    // 如果设置了"仅显示可注册"，则立即过滤
+                    if (showAvailableOnlyCheckbox.checked && !isAvailable) {
+                        newRow.style.display = 'none';
+                    }
+                }
+                
+                // 更新结果计数
+                document.getElementById('result-count').textContent = currentCount + batchResultCount;
+            }
+            
+            // 模拟完成查询
+            function finishQuery() {
+                isQuerying = false;
+                document.querySelector('.query-status').innerHTML = 
+                    '<i class="fas fa-check-circle text-success mr-2"></i> 查询完成';
+                stopQueryBtn.disabled = true;
+                
+                // 重新启用开始查询按钮
+                startQueryBtn.disabled = false;
+            }
+            
+            // 生成随机域名
+            function generateRandomDomain(length, extension) {
+                const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+                let domain = '';
+                for (let i = 0; i < length; i++) {
+                    domain += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return domain + '.' + extension;
+            }
+            
+            // 过滤可注册域名
+            function filterAvailableDomains(showOnlyAvailable) {
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const status = row.querySelector('.status-badge');
+                    if (showOnlyAvailable && !status.classList.contains('status-available')) {
+                        row.style.display = 'none';
+                    } else {
+                        row.style.display = '';
+                    }
+                });
+            }
+            
+            // 保存可注册域名
+            function saveAvailableDomains() {
+                const availableDomains = [];
+                const rows = document.querySelectorAll('tbody tr');
+                
+                rows.forEach(row => {
+                    const statusBadge = row.querySelector('.status-badge');
+                    if (statusBadge && statusBadge.classList.contains('status-available')) {
+                        const domain = row.querySelector('td:nth-child(2)').textContent;
+                        availableDomains.push(domain);
+                    }
+                });
+                
+                if (availableDomains.length > 0) {
+                    // 模拟保存操作
+                    console.log(`已保存${availableDomains.length}个可注册域名到数据库`);
+                    alert(`已成功保存${availableDomains.length}个可注册域名到数据库`);
+                } else {
+                    alert('没有可注册的域名可保存');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

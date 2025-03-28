@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>80年代风格域名管理系统 - 原型展示</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .prototype-container {
+            border: 1px solid #ddd;
+            margin-bottom: 2rem;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .prototype-frame {
+            width: 100%;
+            border: none;
+            height: 600px;
+            background-color: #fff;
+        }
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            margin: 2rem 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #0078d7;
+            text-shadow: 0 0 5px rgba(0, 120, 215, 0.3);
+        }
+        header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <header>
+        <h1>
+            <i class="fas fa-globe-americas mr-2"></i>
+            复古风格域名管理系统原型
+        </h1>
+        <p class="text-center text-gray-500 mb-4">查看不同界面的原型设计 | 每个界面都以独立HTML文件呈现</p>
+    </header>
+
+    <div class="container mx-auto">
+        <!-- 登录界面 -->
+        <div class="prototype-container">
+            <iframe src="login.html" class="prototype-frame"></iframe>
+        </div>
+
+        <!-- 启动界面 -->
+        <div class="prototype-container">
+            <iframe src="boot.html" class="prototype-frame"></iframe>
+        </div>
+
+        <!-- 仪表盘界面 -->
+        <div class="prototype-container">
+            <iframe src="dashboard.html" class="prototype-frame"></iframe>
+        </div>
+
+        <!-- 域名查询界面 -->
+        <div class="prototype-container">
+            <iframe src="domain-search.html" class="prototype-frame"></iframe>
+        </div>
+
+        <!-- 域名管理界面 -->
+        <div class="prototype-container">
+            <iframe src="domain-management.html" class="prototype-frame"></iframe>
+        </div>
+
+        <!-- 用户管理界面 -->
+        <div class="prototype-container">
+            <iframe src="user-management.html" class="prototype-frame"></iframe>
+        </div>
+
+        <!-- 设置界面 -->
+        <div class="prototype-container">
+            <iframe src="settings.html" class="prototype-frame"></iframe>
+        </div>
+
+        <!-- 命令行终端 -->
+        <div class="prototype-container">
+            <iframe src="terminal.html" class="prototype-frame"></iframe>
+        </div>
+    </div>
+
+    <footer class="text-center mt-10 text-gray-500 text-sm">
+        <p>复古风格域名管理系统原型 &copy; 2023</p>
+    </footer>
+</body>
+</html> 
