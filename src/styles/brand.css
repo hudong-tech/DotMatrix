@@ -1,0 +1,51 @@
+/* 左侧导航栏品牌部分样式 */
+.nav-brand {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.nav-brand-logo {
+    width: 45px;
+    height: 45px;
+    margin-right: 0.7rem;
+    filter: drop-shadow(0 0 3px var(--main-text-color));
+}
+
+.nav-brand-title {
+    font-family: var(--terminal-font);
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--main-text-color);
+    text-shadow: 1px 1px 0 rgba(0, 50, 0, 0.5), 
+                -1px -1px 0 rgba(0, 255, 0, 0.2);
+    font-weight: bold;
+    padding: 2px 0;
+    background: linear-gradient(to bottom, 
+                rgba(0, 255, 0, 0.05) 0%, 
+                rgba(0, 255, 0, 0.1) 50%, 
+                rgba(0, 255, 0, 0.05) 100%);
+    position: relative;
+    max-width: 170px;
+}
+
+.nav-brand-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+}

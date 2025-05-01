@@ -1,0 +1,41 @@
+/* 用户信息和时间显示样式 */
+.user-info {
+    font-family: 'VT323', monospace !important;
+    font-size: 1rem !important;
+    margin-right: 1rem;
+}
+
+/* 退出链接样式 */
+.logout-link {
+    font-family: 'VT323', monospace !important;
+    font-size: 1rem !important;
+    color: var(--warning-color);
+    text-decoration: none;
+}
+
+.logout-link:hover {
+    text-decoration: underline;
+}
+
+/* 主题切换包装器 */
+.theme-switch-wrapper {
+    margin-right: 1rem;
+}
+
+/* Flex布局工具类 */
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.mr-4 {
+    margin-right: 1rem;
+}
+
+/* 添加到header.css文件中 */
+.time-display {
+    margin-left: 4px;
+}
