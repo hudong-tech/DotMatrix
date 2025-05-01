@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotMatrix.io Logo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --main-text-color: #008000;
+            --border-color: #e0e0e0;
+        }
+        
+        [data-theme="dark"] {
+            --main-text-color: #33ff33;
+            --border-color: #33ff33;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: transparent;
+        }
+        
+        /* Logo样式 */
+        .dot-matrix-logo {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(0, 128, 0, 0.1);
+            border: 2px dotted var(--main-text-color);
+            overflow: hidden;
+            transform: rotate(15deg);
+            box-shadow: 0 0 15px rgba(0, 128, 0, 0.3);
+        }
+        
+        /* 添加印章边缘效果 */
+        .dot-matrix-logo::after {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 1px dashed var(--main-text-color);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: spin 30s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .logo-terminal {
+            font-size: 2.5rem;
+            position: relative;
+            z-index: 2;
+            color: var(--main-text-color);
+            text-shadow: 0 0 8px var(--main-text-color);
+        }
+        
+        .logo-matrix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            z-index: 1;
+            opacity: 0.3;
+        }
+        
+        .matrix-dot {
+            width: 4px;
+            height: 4px;
+            background-color: var(--main-text-color);
+            border-radius: 50%;
+            margin: auto;
+        }
+        
+        @keyframes blink-dot {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        .matrix-dot:nth-child(3n) {
+            animation: blink-dot 2s infinite;
+        }
+        
+        .matrix-dot:nth-child(5n) {
+            animation: blink-dot 3s infinite 0.5s;
+        }
+        
+        .matrix-dot:nth-child(7n) {
+            animation: blink-dot 2.5s infinite 1s;
+        }
+        
+        @keyframes scan-line {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        
+        .scan-line {
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            background-color: var(--main-text-color);
+            opacity: 0.5;
+            animation: scan-line 2s linear infinite;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+    <div class="dot-matrix-logo">
+        <i class="fas fa-terminal logo-terminal"></i>
+        <div class="logo-matrix">
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+            <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+        </div>
+        <div class="scan-line"></div>
+    </div>
+
+    <script>
+        // 检测父窗口的主题并应用
+        function checkParentTheme() {
+            try {
+                const parentTheme = window.parent.document.body.getAttribute('data-theme');
+                if (parentTheme === 'dark') {
+                    document.body.setAttribute('data-theme', 'dark');
+                } else {
+                    document.body.removeAttribute('data-theme');
+                }
+            } catch (e) {
+                // 如果无法访问父窗口，使用默认主题
+                console.log('无法获取父窗口主题');
+            }
+        }
+
+        // 初始检查并设置监听
+        window.addEventListener('load', checkParentTheme);
+        
+        // 定期检查主题变化
+        setInterval(checkParentTheme, 1000);
+    </script>
+</body>
+</html> 
