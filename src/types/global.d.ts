@@ -18,7 +18,7 @@ declare interface Window {
 }
 
 // 域名类型定义
-declare interface DomainInfo {
+export interface DomainInfo {
   id: number
   name: string
   extension: string
@@ -30,7 +30,7 @@ declare interface DomainInfo {
 }
 
 // 查询状态类型
-declare interface QueryStatus {
+export interface QueryStatus {
   isQuerying: boolean
   currentBatch: number
   totalBatches: number
