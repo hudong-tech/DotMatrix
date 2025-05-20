@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 // 移除重复的模块声明
 import logo from './assets/logo/logo.svg' // 使用正确的SVG文件
 import DomainSearch from './components/DomainSearch'
+import Menu from './components/Menu'
+import NavHeader from './components/NavHeader'
 
 function App(): React.ReactElement {
   // 主题切换功能
@@ -81,70 +83,9 @@ function App(): React.ReactElement {
 
   return (
     <div className='app-container'>
-      <div className='sidebar'>
-        <div className='nav-brand'>
-          <img src={logo} alt='DotMatrix Logo' className='nav-brand-logo' />
-          <div className='nav-brand-title'>DotMatrix.io</div>
-        </div>
-        <nav className='nav-menu'>
-          <div
-            className={`nav-item ${activeMenu === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('dashboard')}
-          >
-            <i className='fas fa-chart-line'></i>仪表盘
-          </div>
-          <div
-            className={`nav-item ${activeMenu === 'domain-search' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('domain-search')}
-          >
-            <i className='fas fa-search'></i>域名查询
-          </div>
-          <div
-            className={`nav-item ${activeMenu === 'domain-management' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('domain-management')}
-          >
-            <i className='fas fa-tags'></i>域名管理
-          </div>
-          <div
-            className={`nav-item ${activeMenu === 'user-management' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('user-management')}
-          >
-            <i className='fas fa-users'></i>用户管理
-          </div>
-          <div
-            className={`nav-item ${activeMenu === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('settings')}
-          >
-            <i className='fas fa-cog'></i>系统设置
-          </div>
-        </nav>
-      </div>
+      <Menu activeMenu={activeMenu} onMenuClick={setActiveMenu} />
       <div className='main-content'>
-        <header className='header'>
-          <div>
-            <h1>{getPageTitle()}</h1>
-          </div>
-          <div className='flex items-center'>
-            <div className='user-info mr-4'>
-              <span>用户: ADMIN</span> |{' '}
-              <span className='time-display' id='timeDisplay'>
-                {' '}
-                {time}
-              </span>
-            </div>
-
-            <div className='theme-switch-wrapper mr-4'>
-              <label className='theme-switch'>
-                <input type='checkbox' checked={isDarkTheme} onChange={() => setIsDarkTheme(!isDarkTheme)} />
-                <span className='slider'></span>
-              </label>
-            </div>
-
-            <a href='#' className='logout-link'>
-              <i className='fas fa-power-off'></i> 退出
-            </a>
-          </div>
-        </header>
+        <NavHeader title={getPageTitle()} time={time} isDarkTheme={isDarkTheme} onThemeChange={setIsDarkTheme} />
         <div className='container'>{renderContent()}</div>
       </div>
     </div>
