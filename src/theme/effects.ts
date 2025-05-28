@@ -1,7 +1,23 @@
 export const effects = {
+  // 过渡动画的持续时间tokens
+  durations: {
+    default: '300ms', // 标准过渡时间，用于大多数交互
+    fast: '200ms', // 快速过渡，用于hover等即时反馈
+    slow: '500ms' // 慢速过渡，用于重要状态变化
+  },
+
+  // 过渡动画的缓动函数tokens
+  timingFunctions: {
+    default: 'ease', // 标准缓动，先快后慢
+    easeIn: 'ease-in', // 渐入，越来越快
+    easeOut: 'ease-out', // 渐出，越来越慢
+    linear: 'linear' // 线性，匀速
+  },
+
+  // 完整的transition定义（用于CSS）
   transitions: {
     default: 'all 0.3s ease',
-    fast: 'all 0.2s'
+    fast: 'all 0.2s ease'
   },
   animations: {
     flicker: {

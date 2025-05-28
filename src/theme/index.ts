@@ -35,7 +35,7 @@ export const tailwindTheme = {
     secondary: lightTheme.colors.secondary,
     warning: lightTheme.colors.warning,
     error: lightTheme.colors.error,
-    success: '#0a8c36', // 从CSS中提取的成功颜色
+    success: lightTheme.colors.success,
     border: lightTheme.colors.border,
     panel: lightTheme.colors.panelBg,
     nav: lightTheme.colors.navBg,

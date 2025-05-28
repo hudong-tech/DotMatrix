@@ -4,6 +4,7 @@ export const lightColors = {
   mainText: '#008000',
   secondary: '#008000',
   warning: '#aa5500',
+  success: '#0a8c36',
   error: '#aa0000',
   border: '#e0e0e0',
 
@@ -21,6 +22,7 @@ export const darkColors = {
   mainText: '#33ff33',
   secondary: '#33ff33',
   warning: '#ffff33',
+  success: '#00ff00',
   error: '#ff3333',
   border: '#33ff33',
 
